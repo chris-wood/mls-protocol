@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-10-22T00:57:50.477788+00:00",
+  "timestamp": "2020-10-25T01:01:01.425224+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -4304,6 +4304,30 @@
           "body": "Solved by merging #427 . Closing.",
           "createdAt": "2020-10-20T15:41:44Z",
           "updatedAt": "2020-10-20T15:41:44Z"
+        }
+      ]
+    },
+    {
+      "number": 432,
+      "id": "MDU6SXNzdWU3Mjc5ODI3OTU=",
+      "title": "Remove the concept of leaf indices",
+      "url": "https://github.com/mlswg/mls-protocol/issues/432",
+      "state": "OPEN",
+      "author": "kkohbrok",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "We currently distinguish between leaf indices and node indices, where node indices are a straight-forward index in the array representing a ratcheting tree and leaf indices index what (I think) used be called the roster, an array just containing the members. However, the roster was removed and instead, we always use the ratcheting tree array when referring to both nodes and leaves. As a result, whenever we use a leaf index, we have to translate it to a node index when actually indexing the array. I don't see a reason for this added complexity and propose only use node indices.\r\n\r\nThis was already discussed a bit in #431 , where @bifurcation pointed out that leaf indices make sure that a Remove only ever references a leaf. I think having a little check here that the index actually refers to a leaf is preferable over having to translate back and forth in many other places. Note, that we have to check anyway if the index in Remove is within the bounds of the tree, regardless of it being a leaf or a node index.\r\n\r\nI'm happy to provide a PR if this is something we want to do.",
+      "createdAt": "2020-10-23T07:25:18Z",
+      "updatedAt": "2020-10-23T17:49:16Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "When I mentioned Remove in the context of #431, that was only an initial example.  Here's a more fulsome list of where leaf indices are used:\r\n\r\n* `Remove.removed`\r\n* `ParentNode.unmerged_leaves`\r\n* `MLSPlaintext.Sender.sender`\r\n* `GroupInfo.signer_index`\r\n\r\nAll of those are cases where a node index would be nonsensical.  So while even with a leaf index, you still have to bounds-check, you're basically asking for us to allow more nonsensical cases to be expressible in the syntax.\r\n\r\nAs far as comprehensibility / implementability: The difference between node indices and leaf indices is clearly laid out in the [tree terminology section](https://github.com/mlswg/mls-protocol/blob/master/draft-ietf-mls-protocol.md#tree-computation-terminology), and AFAICT, all of the references to indices are clear about which one they refer to.  \r\n\r\nThis distinction is a good one for implementors to have in mind, and not just to simplify parsing / input validation on messages as above.  There are lots of internal methods that only make sense to refer to leaves as well.  For example, a TreeKEM implementation internal to an MLS implementation will need to know the index of the caller of `TreeKEM.encap()` so that it can make the right UpdatePath.  Here again, providing a node index is nonsensical.  So implementations will likely end up needing to differentiate leaves from nodes *anyway*.\r\n\r\nNet of all that, I propose closing this with no action.\r\n",
+          "createdAt": "2020-10-23T17:49:15Z",
+          "updatedAt": "2020-10-23T17:49:15Z"
         }
       ]
     }
@@ -30415,26 +30439,42 @@
       "id": "MDExOlB1bGxSZXF1ZXN0NTA3MDg3OTY0",
       "title": "Update changelog for draft-10",
       "url": "https://github.com/mlswg/mls-protocol/pull/429",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "We have a changelog for the document by I-D release, but haven't been updating it as we go.  This PR updates the changelog based on merged PRs and the few we expect to close before releasing draft-10.\r\n\r\nMarking this as draft right now, until the other PRs have merged.",
       "createdAt": "2020-10-20T20:49:50Z",
-      "updatedAt": "2020-10-20T20:49:50Z",
+      "updatedAt": "2020-10-23T18:32:36Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "master",
       "baseRefOid": "5acf3e402023eb3cab5675d188844a22f1a78563",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "change-log-10",
       "headRefOid": "47f6c09bf7696849f27206aa9794e3261ce43d5f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2020-10-23T18:32:36Z",
+      "mergedAt": "2020-10-23T18:32:36Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "6c89e9fb40b15f225d0349b88426ac7ee2124212"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE1OTA3NTk5",
+          "commit": {
+            "abbreviatedOid": "47f6c09"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-10-23T18:27:39Z",
+          "updatedAt": "2020-10-23T18:27:39Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 430,
@@ -30475,6 +30515,310 @@
           "createdAt": "2020-10-21T14:40:47Z",
           "updatedAt": "2020-10-21T14:40:47Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 431,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTA4MDg0ODg4",
+      "title": "Secret Tree: clarifications and typos",
+      "url": "https://github.com/mlswg/mls-protocol/pull/431",
+      "state": "MERGED",
+      "author": "fxguenther",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [
+        "editorial"
+      ],
+      "body": "Some clarifications and typos from my attempt to understand secret trees and the deletion schedule. Please verify that I'm correct in that `joiner_secret` and `member_secret` also need to be consumed.",
+      "createdAt": "2020-10-22T07:37:44Z",
+      "updatedAt": "2020-10-23T17:38:24Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "master",
+      "baseRefOid": "54519449b09423bd2a44702f5be9388ebdf8bc48",
+      "headRepository": "fxguenther/mls-protocol",
+      "headRefName": "secret-tree-clarifications",
+      "headRefOid": "0a9562f5b9fdc9096984b31bf61a5b949390b760",
+      "closedAt": "2020-10-23T17:38:24Z",
+      "mergedAt": "2020-10-23T17:38:24Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "600d1d13ed7ddf7e13e21acfad76c31fdc933153"
+      },
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'll hold off on merging until we resolve the discussion above, though.",
+          "createdAt": "2020-10-22T14:21:26Z",
+          "updatedAt": "2020-10-22T14:21:26Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0NTEwMzA3",
+          "commit": {
+            "abbreviatedOid": "b466ab0"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-22T09:02:57Z",
+          "updatedAt": "2020-10-22T10:12:09Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "Wouldn't this be the leaf index instead? It shouldn't make an actual difference, but it seems more appropriate here since the sender ratchets are based on leaf indexes, not node indexes.",
+              "createdAt": "2020-10-22T09:02:57Z",
+              "updatedAt": "2020-10-22T14:31:51Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0NjA3MjU1",
+          "commit": {
+            "abbreviatedOid": "b466ab0"
+          },
+          "author": "fxguenther",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-22T11:03:54Z",
+          "updatedAt": "2020-10-22T11:03:55Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "This might be me being confused, however I understood the \"index\" in this sentence (and the subsequent key derivation) referring to N, and N being the node index:\r\n\r\n> Nodes are also assigned an index according to their position in the array representation of the tree (described in Appendix A).\r\n\r\nGiven that we derive, e.g., `handshake_ratchet_secret_[N]_[0]` from `tree_node_[N]_secret`, and the latter being defined on these node indices, I assumed that, throughout, N should be a node index.\r\n\r\nIf you say the symmetric ratchets `..._ratchet_secret_...` are identified via _leaf indices_, then I'd agree this should all better refer to those leaf indices.",
+              "createdAt": "2020-10-22T11:03:54Z",
+              "updatedAt": "2020-10-22T14:31:51Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0NjM3NTM1",
+          "commit": {
+            "abbreviatedOid": "b466ab0"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-22T11:47:28Z",
+          "updatedAt": "2020-10-22T11:47:29Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "This seems to be quite under-specified indeed. I was working under the assumption that members are always referenced by leaf indexes, because node indexes are only relevant for operation within the tree, not at the leaf level.\r\n@Bren2010 @bifurcation any opinion on which it is?",
+              "createdAt": "2020-10-22T11:47:29Z",
+              "updatedAt": "2020-10-22T14:31:51Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0Nzc0MzUz",
+          "commit": {
+            "abbreviatedOid": "b466ab0"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "With the formatting nits noted, this LGTM.  Thanks @fxguenther !",
+          "createdAt": "2020-10-22T14:14:02Z",
+          "updatedAt": "2020-10-22T14:18:05Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "The `N` in the indices in subscripts and context values is a **node** index, not a **leaf** index.  You need that to be the case so that you don't have collisions from switching between them.  If you want, we could clarify that the member at leaf `n` uses `ratchet_secret_[2*n]_[*]` (recall that the node index of the `n`-th leaf is `2*n`).",
+              "createdAt": "2020-10-22T14:14:02Z",
+              "updatedAt": "2020-10-22T14:31:51Z"
+            },
+            {
+              "originalPosition": 55,
+              "body": "```suggestion\r\n* the `commit_secret`, `joiner_secret`, `member_secret`, `epoch_secret`,\r\n  `encryption_secret` of that epoch n as well as the `init_secret` of the\r\n  previous epoch n-1,\r\n```",
+              "createdAt": "2020-10-22T14:16:27Z",
+              "updatedAt": "2020-10-22T14:31:51Z"
+            },
+            {
+              "originalPosition": 60,
+              "body": "```suggestion\r\n  node index N,\r\n```",
+              "createdAt": "2020-10-22T14:16:56Z",
+              "updatedAt": "2020-10-22T14:31:51Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0Nzg3Njk2",
+          "commit": {
+            "abbreviatedOid": "b466ab0"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-22T14:26:22Z",
+          "updatedAt": "2020-10-22T14:26:22Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "Is there a reason for keeping both node and leaf index around conceptually? Aren't we only ever indexing the tree array? If that is the case, why not just use node indices everywhere?",
+              "createdAt": "2020-10-22T14:26:22Z",
+              "updatedAt": "2020-10-22T14:31:51Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0NzkzMDE3",
+          "commit": {
+            "abbreviatedOid": "b466ab0"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-22T14:30:34Z",
+          "updatedAt": "2020-10-22T14:30:34Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "The case that comes immediately to mind: In Remove, it's nice if the syntax constrains you so that you can only remove leaf nodes, not arbitrary nodes.",
+              "createdAt": "2020-10-22T14:30:34Z",
+              "updatedAt": "2020-10-22T14:31:51Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0Nzk0NTQ0",
+          "commit": {
+            "abbreviatedOid": "0a9562f"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-22T14:31:53Z",
+          "updatedAt": "2020-10-22T14:31:53Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "FWIW, in the implementation work I've done, it has been pretty simple to avoid confusion by having LeafIndex and NodeIndex types and using type conversion to implement the relevant math.",
+              "createdAt": "2020-10-22T14:31:53Z",
+              "updatedAt": "2020-10-22T14:31:53Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0ODA1MTMy",
+          "commit": {
+            "abbreviatedOid": "0a9562f"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-22T14:41:39Z",
+          "updatedAt": "2020-10-22T14:41:40Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "It would be more robust if we exclusively used node indices. You still have to be mindful about where you have to convert and where you don't. We can add a simple check to Remove to make sure that only leaf nodes get removed. We have to check that the leaf is within the tree size anyway.\r\n\r\nYou told me before that we don't add stuff to the standard without good reason, so why now keep it in? :wink: \r\nBeside saving us the check at Remove: Is there really a reason to keep leaf indices around?",
+              "createdAt": "2020-10-22T14:41:40Z",
+              "updatedAt": "2020-10-22T14:41:40Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0ODgxODgy",
+          "commit": {
+            "abbreviatedOid": "0a9562f"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-22T15:55:47Z",
+          "updatedAt": "2020-10-22T15:55:48Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "To second what Konrad said: We need to do checks for Removes anyway, since you can't remove an empty leaf node and the index has to be <= than the number of members, so this would just be one more test.\r\nI like the idea to have only one type of index for all operations that are covered by the spec. Naturally applications can then choose to reference members with a different scheme if they so wish (especially since empty leaf nodes are already an issue today if the member list uses leaf indexes).",
+              "createdAt": "2020-10-22T15:55:47Z",
+              "updatedAt": "2020-10-22T15:55:48Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0OTIzODM1",
+          "commit": {
+            "abbreviatedOid": "0a9562f"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-10-22T16:42:49Z",
+          "updatedAt": "2020-10-22T16:42:49Z",
+          "comments": []
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE0OTMxNDQ1",
+          "commit": {
+            "abbreviatedOid": "0a9562f"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-22T16:52:04Z",
+          "updatedAt": "2020-10-22T16:52:05Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "- Leaf index is used in Remove and in `unmerged_leaves`, and also in internal APIs that refer to specific members\r\n- Like Richard, I haven't had trouble keeping leaf and node ids separate in my implementation\r\n- I personally like keeping the two separate because it's more semantic",
+              "createdAt": "2020-10-22T16:52:05Z",
+              "updatedAt": "2020-10-22T16:52:05Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE1NDAyNDI3",
+          "commit": {
+            "abbreviatedOid": "0a9562f"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-23T07:17:37Z",
+          "updatedAt": "2020-10-23T07:17:37Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "I've created a separate issue (#432) for this, so this PR can go ahead. \r\n\r\nI'm aware that leaf indices are used, I just don't think they are necessary. As far as I can see, in every place they are used you can simply use a node index instead, with the exception of the Remove, where you have to add a simple check. Just because you _can_ implement it (and have already done so) doesn't mean it should be in the spec.",
+              "createdAt": "2020-10-23T07:17:37Z",
+              "updatedAt": "2020-10-23T07:35:03Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE1ODc0MTk4",
+          "commit": {
+            "abbreviatedOid": "0a9562f"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-23T17:38:16Z",
+          "updatedAt": "2020-10-23T17:38:16Z",
+          "comments": [
+            {
+              "originalPosition": 27,
+              "body": "Thanks for following that issue, @kkohbrok.  If that issue is off the table, I think this is clear to merge.",
+              "createdAt": "2020-10-23T17:38:16Z",
+              "updatedAt": "2020-10-23T17:38:16Z"
+            }
+          ]
         }
       ]
     }
