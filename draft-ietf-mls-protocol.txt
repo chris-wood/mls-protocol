@@ -1801,8 +1801,9 @@ Internet-Draft                     MLS                      October 2020
    context = SetupBaseR(kem_output, external_priv, PublicGroupState)
    init_secret = context.export("MLS 1.0 external init secret", KDF.Nh)
 
-   In both cases, the "info" input to HPKE is set to the GroupKeyPackage
-   for the previous epoch, encoded using the TLS serialization.
+   In both cases, the "info" input to HPKE is set to the
+   PublicGroupState for the previous epoch, encoded using the TLS
+   serialization.
 
 8.2.  Pre-Shared Keys
 
@@ -1839,9 +1840,8 @@ Internet-Draft                     MLS                      October 2020
       current group members wish to branch based on the current group
       state.
 
-   The injection of one or more PSKs into the key schedule is signaled
-   in two ways: 1) as a "psk" proposal and 2) in the "GroupSecrets"
-   object of a Welcome message sent to new members added in that epoch.
+
+
 
 
 
@@ -1849,6 +1849,10 @@ Barnes, et al.            Expires 29 April 2021                [Page 33]
 
 Internet-Draft                     MLS                      October 2020
 
+
+   The injection of one or more PSKs into the key schedule is signaled
+   in two ways: 1) as a "psk" proposal and 2) in the "GroupSecrets"
+   object of a Welcome message sent to new members added in that epoch.
 
    enum {
      reserved(0),
@@ -1888,6 +1892,20 @@ Internet-Draft                     MLS                      October 2020
    included in the Key Schedule is derived as follows (where "n" is the
    number of PSKs):
 
+
+
+
+
+
+
+
+
+
+Barnes, et al.            Expires 29 April 2021                [Page 34]
+
+Internet-Draft                     MLS                      October 2020
+
+
 struct {
     PreSharedKeyID;
     uint16 index;
@@ -1897,14 +1915,6 @@ struct {
 psk_input_[i] = KDF.Extract(0, psk_[i])
 psk_secret_[i] = ExpandWithLabel(psk_input_[i], "derived psk", PSKLabel, KDF.Nh)
 psk_secret     = psk_secret_[i] || ... || psk_secret_[n]
-
-
-
-
-Barnes, et al.            Expires 29 April 2021                [Page 34]
-
-Internet-Draft                     MLS                      October 2020
-
 
 8.3.  Secret Tree
 
@@ -1943,16 +1953,6 @@ Internet-Draft                     MLS                      October 2020
            +--> DeriveTreeSecret(., "tree", right(N), 0, KDF.Nh)
                 = tree_node_[right(N)]_secret
 
-   The secret in the leaf of the Secret Tree is used to initiate two
-   symmetric hash ratchets, from which a sequence of single-use keys and
-   nonces are derived, as described in Section 8.4.  The root of each
-   ratchet is computed as:
-
-
-
-
-
-
 
 
 
@@ -1961,6 +1961,11 @@ Barnes, et al.            Expires 29 April 2021                [Page 35]
 
 Internet-Draft                     MLS                      October 2020
 
+
+   The secret in the leaf of the Secret Tree is used to initiate two
+   symmetric hash ratchets, from which a sequence of single-use keys and
+   nonces are derived, as described in Section 8.4.  The root of each
+   ratchet is computed as:
 
    tree_node_[N]_secret
            |
@@ -2005,11 +2010,6 @@ Internet-Draft                     MLS                      October 2020
    the ratchet.  In particular, the index of the sender's leaf in the
    ratchet tree is the same as the index of the leaf in the Secret Tree
    used to initialize the sender's ratchet.
-
-
-
-
-
 
 
 
@@ -3225,7 +3225,7 @@ Internet-Draft                     MLS                      October 2020
 
    *  external public key
 
-   This information is aggregated in a "GroupKeyPackage" object as
+   This information is aggregated in a "PublicGroupState" object as
    follows:
 
    "struct { CipherSuite cipher_suite; opaque group_id<0..255>; uint64
