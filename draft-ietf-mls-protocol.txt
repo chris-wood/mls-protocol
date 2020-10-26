@@ -1779,11 +1779,11 @@ Internet-Draft                     MLS                      October 2020
 
    In this process, the joiner sends a new "init_secret" value to the
    group using the HPKE export method.  The joiner then uses that
-   "init_secret" with information provided in the GroupKeyPackage and an
-   external Commit to initialize their copy of the key schedule for the
-   new epoch.
+   "init_secret" with information provided in the PublicGroupState and
+   an external Commit to initialize their copy of the key schedule for
+   the new epoch.
 
-   kem_output, context = SetupBaseS(external_pub, GroupKeyPackage)
+   kem_output, context = SetupBaseS(external_pub, PublicGroupState)
    init_secret = context.export("MLS 1.0 external init secret", KDF.Nh)
 
 
