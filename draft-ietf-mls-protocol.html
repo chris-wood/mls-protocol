@@ -2737,7 +2737,7 @@ init_secret = context.export("MLS 1.0 external init secret", KDF.Nh)
 preform the corresponding calculation to retrieve the <code>init_secret</code> value.<a href="#section-8.1-4" class="pilcrow">¶</a></p>
 <div class="artwork art-text alignLeft" id="section-8.1-5">
 <pre>
-context = SetupBaseR(kem_output, external_priv, GroupKeyPackage)
+context = SetupBaseR(kem_output, external_priv, PublicGroupState)
 init_secret = context.export("MLS 1.0 external init secret", KDF.Nh)
 </pre><a href="#section-8.1-5" class="pilcrow">¶</a>
 </div>
