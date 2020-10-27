@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-10-25T01:01:01.425224+00:00",
+  "timestamp": "2020-10-27T00:59:51.102841+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -4312,15 +4312,15 @@
       "id": "MDU6SXNzdWU3Mjc5ODI3OTU=",
       "title": "Remove the concept of leaf indices",
       "url": "https://github.com/mlswg/mls-protocol/issues/432",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "kkohbrok",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "We currently distinguish between leaf indices and node indices, where node indices are a straight-forward index in the array representing a ratcheting tree and leaf indices index what (I think) used be called the roster, an array just containing the members. However, the roster was removed and instead, we always use the ratcheting tree array when referring to both nodes and leaves. As a result, whenever we use a leaf index, we have to translate it to a node index when actually indexing the array. I don't see a reason for this added complexity and propose only use node indices.\r\n\r\nThis was already discussed a bit in #431 , where @bifurcation pointed out that leaf indices make sure that a Remove only ever references a leaf. I think having a little check here that the index actually refers to a leaf is preferable over having to translate back and forth in many other places. Note, that we have to check anyway if the index in Remove is within the bounds of the tree, regardless of it being a leaf or a node index.\r\n\r\nI'm happy to provide a PR if this is something we want to do.",
       "createdAt": "2020-10-23T07:25:18Z",
-      "updatedAt": "2020-10-23T17:49:16Z",
-      "closedAt": null,
+      "updatedAt": "2020-10-25T06:49:41Z",
+      "closedAt": "2020-10-25T06:49:41Z",
       "comments": [
         {
           "author": "bifurcation",
@@ -4328,6 +4328,13 @@
           "body": "When I mentioned Remove in the context of #431, that was only an initial example.  Here's a more fulsome list of where leaf indices are used:\r\n\r\n* `Remove.removed`\r\n* `ParentNode.unmerged_leaves`\r\n* `MLSPlaintext.Sender.sender`\r\n* `GroupInfo.signer_index`\r\n\r\nAll of those are cases where a node index would be nonsensical.  So while even with a leaf index, you still have to bounds-check, you're basically asking for us to allow more nonsensical cases to be expressible in the syntax.\r\n\r\nAs far as comprehensibility / implementability: The difference between node indices and leaf indices is clearly laid out in the [tree terminology section](https://github.com/mlswg/mls-protocol/blob/master/draft-ietf-mls-protocol.md#tree-computation-terminology), and AFAICT, all of the references to indices are clear about which one they refer to.  \r\n\r\nThis distinction is a good one for implementors to have in mind, and not just to simplify parsing / input validation on messages as above.  There are lots of internal methods that only make sense to refer to leaves as well.  For example, a TreeKEM implementation internal to an MLS implementation will need to know the index of the caller of `TreeKEM.encap()` so that it can make the right UpdatePath.  Here again, providing a node index is nonsensical.  So implementations will likely end up needing to differentiate leaves from nodes *anyway*.\r\n\r\nNet of all that, I propose closing this with no action.\r\n",
           "createdAt": "2020-10-23T17:49:15Z",
           "updatedAt": "2020-10-23T17:49:15Z"
+        },
+        {
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Fair enough. Closing this, then.",
+          "createdAt": "2020-10-25T06:49:23Z",
+          "updatedAt": "2020-10-25T06:49:23Z"
         }
       ]
     }
@@ -28685,24 +28692,26 @@
       "id": "MDExOlB1bGxSZXF1ZXN0NDkwNDczOTI0",
       "title": "External Commits",
       "url": "https://github.com/mlswg/mls-protocol/pull/406",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "raphaelrobert",
       "authorAssociation": "MEMBER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2020-09-21T18:13:54Z",
-      "updatedAt": "2020-10-21T15:32:21Z",
+      "updatedAt": "2020-10-26T22:50:52Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "master",
-      "baseRefOid": "f6ff3e41c702dabcaa0721878fec337669dd459d",
+      "baseRefOid": "6c89e9fb40b15f225d0349b88426ac7ee2124212",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "external_commit",
-      "headRefOid": "8773fc3c027a1578f45fe45aef8d5b671cfb6f58",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "bc8445ceecb96c4742ca5dba0b792f9d974ab3cd",
+      "closedAt": "2020-10-26T21:35:05Z",
+      "mergedAt": "2020-10-26T21:35:05Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "5ea742c9770cd5f8b2964badba4e6e7b756fa13f"
+      },
       "comments": [],
       "reviews": [
         {
@@ -28721,7 +28730,7 @@
               "originalPosition": 5,
               "body": "```suggestion\r\n2. A member of the group or a new member broadcasts a Commit message that causes one or more\r\n```",
               "createdAt": "2020-10-05T17:59:54Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28741,7 +28750,7 @@
               "originalPosition": 180,
               "body": "```suggestion\r\n* An external commit MUST reference exactly one ExternalInit proposal, and the\r\n  sender of the proposal MUST be the same as the sender of the Commit. When\r\n  processing a Commit, both existing and new members MUST use the external init\r\n  secret as described in {{external-initialization}}.\r\n```",
               "createdAt": "2020-10-19T17:56:10Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28761,7 +28770,7 @@
               "originalPosition": 181,
               "body": "```suggestion\r\n* An external commit MUST reference no more than one ExternalInit proposal, and the\r\n  ExternalInit proposal MUST be supplied by value, not by reference. When\r\n  processing a Commit, both existing and new members MUST use the external init\r\n  secret as described in {{external-initialization}}.\r\n```",
               "createdAt": "2020-10-19T17:59:51Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28781,7 +28790,7 @@
               "originalPosition": 181,
               "body": "I think we said that `ExternalInit` can only be an inline proposal, but we didn't specify it. So I'd rather specify that requirement in the ExternalInit section.",
               "createdAt": "2020-10-19T18:45:30Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28801,7 +28810,7 @@
               "originalPosition": 181,
               "body": "(I updated your suggestion)",
               "createdAt": "2020-10-19T18:54:16Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28821,7 +28830,7 @@
               "originalPosition": 181,
               "body": "I was about to argue that I don't think it technically needs to be an inline proposal, but it does -- there's no way to send ExternalInit if you're not in the group.  (You can use `new-member` for Add, but not ExternalInit.)  So your tweak works for me.\r\n",
               "createdAt": "2020-10-19T22:38:45Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28841,13 +28850,13 @@
               "originalPosition": 18,
               "body": "Table is messed up again",
               "createdAt": "2020-10-19T22:46:11Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             },
             {
               "originalPosition": 159,
               "body": "The ratchet tree is also needed for external joiners, so let's remove `tree_hash` and replace with `ratchet_tree`, and rename to something more descriptive like `GroupPublicState`",
               "createdAt": "2020-10-19T23:56:42Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28867,7 +28876,7 @@
               "originalPosition": 159,
               "body": "We should keep the same flexibility here. It makes no sense that clients upload a large tree for every epoch, if the tree is maintained by the server.",
               "createdAt": "2020-10-20T14:16:36Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28887,7 +28896,7 @@
               "originalPosition": 159,
               "body": "This structure is already maintained by the server. Users don't have to re-upload the whole thing, they can just tell the DS the new external_pub",
               "createdAt": "2020-10-20T14:58:40Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28907,7 +28916,7 @@
               "originalPosition": 159,
               "body": "In that scenario, in addition to the pub key they also send the hash, so that the server can make sure it has the right public tree.",
               "createdAt": "2020-10-20T15:15:33Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28927,13 +28936,13 @@
               "originalPosition": 144,
               "body": "```suggestion\r\n* interim transcript hash\r\n```",
               "createdAt": "2020-10-20T18:51:40Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             },
             {
               "originalPosition": 156,
               "body": "```suggestion\r\n    opaque interim_transcript_hash<0..255>;\r\n```",
               "createdAt": "2020-10-20T18:52:58Z",
-              "updatedAt": "2020-10-21T15:31:15Z"
+              "updatedAt": "2020-10-26T21:10:46Z"
             }
           ]
         },
@@ -28949,6 +28958,94 @@
           "createdAt": "2020-10-21T15:32:21Z",
           "updatedAt": "2020-10-21T15:32:21Z",
           "comments": []
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE3MDYzMTI4",
+          "commit": {
+            "abbreviatedOid": "8773fc3"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-26T18:27:27Z",
+          "updatedAt": "2020-10-26T18:29:13Z",
+          "comments": [
+            {
+              "originalPosition": 159,
+              "body": "```suggestion\r\n} PublicGroupState;\r\n```",
+              "createdAt": "2020-10-26T18:27:27Z",
+              "updatedAt": "2020-10-26T21:10:46Z"
+            },
+            {
+              "originalPosition": 31,
+              "body": "```suggestion\r\nThe public key `external_pub` can be published as part of the `PublicGroupState`\r\n```",
+              "createdAt": "2020-10-26T18:27:55Z",
+              "updatedAt": "2020-10-26T21:10:46Z"
+            },
+            {
+              "originalPosition": 43,
+              "body": "```suggestion\r\ninformation provided in the PublicGroupState and an external Commit to initialize\r\n```",
+              "createdAt": "2020-10-26T18:28:09Z",
+              "updatedAt": "2020-10-26T21:10:46Z"
+            },
+            {
+              "originalPosition": 47,
+              "body": "```suggestion\r\nkem_output, context = SetupBaseS(external_pub, PublicGroupState)\r\n```",
+              "createdAt": "2020-10-26T18:28:16Z",
+              "updatedAt": "2020-10-26T21:10:46Z"
+            },
+            {
+              "originalPosition": 55,
+              "body": "```suggestion\r\ncontext = SetupBaseR(kem_output, external_priv, PublicGroupState)\r\n```",
+              "createdAt": "2020-10-26T18:28:30Z",
+              "updatedAt": "2020-10-26T21:10:46Z"
+            },
+            {
+              "originalPosition": 59,
+              "body": "```suggestion\r\nIn both cases, the `info` input to HPKE is set to the PublicGroupState for the\r\n```",
+              "createdAt": "2020-10-26T18:28:38Z",
+              "updatedAt": "2020-10-26T21:10:46Z"
+            },
+            {
+              "originalPosition": 148,
+              "body": "```suggestion\r\nThis information is aggregated in a `PublicGroupState` object as follows:\r\n```",
+              "createdAt": "2020-10-26T18:29:00Z",
+              "updatedAt": "2020-10-26T21:10:46Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE3MjI5NzA0",
+          "commit": {
+            "abbreviatedOid": "bc8445c"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-26T22:45:42Z",
+          "updatedAt": "2020-10-26T22:50:52Z",
+          "comments": [
+            {
+              "originalPosition": 109,
+              "body": "proposal",
+              "createdAt": "2020-10-26T22:45:42Z",
+              "updatedAt": "2020-10-26T22:50:52Z"
+            },
+            {
+              "originalPosition": 179,
+              "body": "Shouldn't the signature come from the credential in the Add proposal? Not the Commit. That's how it is for everyone else",
+              "createdAt": "2020-10-26T22:49:31Z",
+              "updatedAt": "2020-10-26T22:50:52Z"
+            },
+            {
+              "originalPosition": 180,
+              "body": "exactly one ExternalInit",
+              "createdAt": "2020-10-26T22:49:56Z",
+              "updatedAt": "2020-10-26T22:50:52Z"
+            }
+          ]
         }
       ]
     },
@@ -30817,6 +30914,73 @@
               "body": "Thanks for following that issue, @kkohbrok.  If that issue is off the table, I think this is clear to merge.",
               "createdAt": "2020-10-23T17:38:16Z",
               "updatedAt": "2020-10-23T17:38:16Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 433,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTEwMzI4MzAx",
+      "title": "Sign the external public key",
+      "url": "https://github.com/mlswg/mls-protocol/pull/433",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The unsigned PublicGroupState created by #406 leads to an attack on the new joiner.  The sender of a GroupPublicState can associate any HPKE it wants with the group, and thus learn the `init_secret` without being a member of the group.  (The UpdatePath and the resulting `commit_secret` partly defend against this attack, though they are subverted if the attacker has compromised any single key used in the Update Path.)\r\n\r\nTo guard against this attack, this PR adds a signature over the HPKE public key in the PublicGroupState.",
+      "createdAt": "2020-10-26T21:49:57Z",
+      "updatedAt": "2020-10-26T23:56:21Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "master",
+      "baseRefOid": "5ea742c9770cd5f8b2964badba4e6e7b756fa13f",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "sign-group-key",
+      "headRefOid": "e18376fefcf9cd40600a761ead06f7ea8839853f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE3MjI3MzY4",
+          "commit": {
+            "abbreviatedOid": "e18376f"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-26T22:40:30Z",
+          "updatedAt": "2020-10-26T22:40:30Z",
+          "comments": [
+            {
+              "originalPosition": 36,
+              "body": "Is there a good reason not to sign everything? Would be simpler and more robust to do so",
+              "createdAt": "2020-10-26T22:40:30Z",
+              "updatedAt": "2020-10-26T22:40:30Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE3MjU3NDM2",
+          "commit": {
+            "abbreviatedOid": "e18376f"
+          },
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-26T23:56:21Z",
+          "updatedAt": "2020-10-26T23:56:21Z",
+          "comments": [
+            {
+              "originalPosition": 36,
+              "body": "I second this question. Following discussion elsewhere on the mailing list, deniability may be pushed to the application level. If deniability was a factor for not signing everything, then it may not apply anymore.",
+              "createdAt": "2020-10-26T23:56:21Z",
+              "updatedAt": "2020-10-26T23:56:21Z"
             }
           ]
         }
