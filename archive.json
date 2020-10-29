@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-10-27T00:59:51.102841+00:00",
+  "timestamp": "2020-10-29T01:01:26.499595+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -30931,7 +30931,7 @@
       "labels": [],
       "body": "The unsigned PublicGroupState created by #406 leads to an attack on the new joiner.  The sender of a GroupPublicState can associate any HPKE it wants with the group, and thus learn the `init_secret` without being a member of the group.  (The UpdatePath and the resulting `commit_secret` partly defend against this attack, though they are subverted if the attacker has compromised any single key used in the Update Path.)\r\n\r\nTo guard against this attack, this PR adds a signature over the HPKE public key in the PublicGroupState.",
       "createdAt": "2020-10-26T21:49:57Z",
-      "updatedAt": "2020-10-26T23:56:21Z",
+      "updatedAt": "2020-10-28T08:18:16Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "master",
       "baseRefOid": "5ea742c9770cd5f8b2964badba4e6e7b756fa13f",
@@ -30981,6 +30981,66 @@
               "body": "I second this question. Following discussion elsewhere on the mailing list, deniability may be pushed to the application level. If deniability was a factor for not signing everything, then it may not apply anymore.",
               "createdAt": "2020-10-26T23:56:21Z",
               "updatedAt": "2020-10-26T23:56:21Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE4MDkzODgw",
+          "commit": {
+            "abbreviatedOid": "e18376f"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-27T19:59:01Z",
+          "updatedAt": "2020-10-27T19:59:01Z",
+          "comments": [
+            {
+              "originalPosition": 36,
+              "body": "Personally, I agree with you both.  @raphaelrobert raised some concerns about deniability due to signing the tree, I think because he doesn't totally buy the \"punt\" argument I presented on the mailing list.  This was the minimum solution to address the obvious problem.",
+              "createdAt": "2020-10-27T19:59:01Z",
+              "updatedAt": "2020-10-27T19:59:01Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE4MTQ5Mzc2",
+          "commit": {
+            "abbreviatedOid": "e18376f"
+          },
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-27T21:04:07Z",
+          "updatedAt": "2020-10-27T21:04:07Z",
+          "comments": [
+            {
+              "originalPosition": 36,
+              "body": "That makes sense. Even if we are still aiming for some form of deniability here, I think that we can sign a little more. For example, the cipher_suite, extensions, should be fine. The opaque_signature should be the main issue with respect to deniability. @raphaelrobert : do you have a strong opinion about not signing the transcript hash?",
+              "createdAt": "2020-10-27T21:04:07Z",
+              "updatedAt": "2020-10-27T21:04:07Z"
+            }
+          ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTE4NDExOTUw",
+          "commit": {
+            "abbreviatedOid": "e18376f"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-28T08:18:15Z",
+          "updatedAt": "2020-10-28T08:18:16Z",
+          "comments": [
+            {
+              "originalPosition": 36,
+              "body": "The difference between signing the transcript hash and signing just the public key is that you need knowledge of the key schedule (and how it was derived) to tie the public key to the rest of the group state, while (if you don't encrypt handshake messages), the transcript hash can be computed by any party observing the traffic. At least as far as I understand the transcript hash computation. So in terms of deniability it certainly gets easier for the adversary.",
+              "createdAt": "2020-10-28T08:18:15Z",
+              "updatedAt": "2020-10-28T08:18:16Z"
             }
           ]
         }
