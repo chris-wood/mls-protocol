@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-10-29T01:01:26.499595+00:00",
+  "timestamp": "2020-11-01T00:38:19.567546+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -30931,7 +30931,7 @@
       "labels": [],
       "body": "The unsigned PublicGroupState created by #406 leads to an attack on the new joiner.  The sender of a GroupPublicState can associate any HPKE it wants with the group, and thus learn the `init_secret` without being a member of the group.  (The UpdatePath and the resulting `commit_secret` partly defend against this attack, though they are subverted if the attacker has compromised any single key used in the Update Path.)\r\n\r\nTo guard against this attack, this PR adds a signature over the HPKE public key in the PublicGroupState.",
       "createdAt": "2020-10-26T21:49:57Z",
-      "updatedAt": "2020-10-28T08:18:16Z",
+      "updatedAt": "2020-10-31T18:18:29Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "master",
       "baseRefOid": "5ea742c9770cd5f8b2964badba4e6e7b756fa13f",
@@ -31043,6 +31043,66 @@
               "updatedAt": "2020-10-28T08:18:16Z"
             }
           ]
+        },
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTIxMTU4OTg1",
+          "commit": {
+            "abbreviatedOid": "e18376f"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2020-10-31T18:18:29Z",
+          "updatedAt": "2020-10-31T18:18:29Z",
+          "comments": [
+            {
+              "originalPosition": 36,
+              "body": "Sorry for the late reply. I think the PR really just covers the bare minimum of what needs to be signed. My initial proposal was to cover the whole PublicGroupState struct by the signature, except for the tree_hash field.\r\nJust like @br-hale I think including the transcript hash would make this more robust. That being said, @kkohbrok has a very valid point here: the transcript hash can be computed by a passive network observer without any knowledge of group secrets (this is where we are missing the derived epoch IDs we discarded). My intuition is that if we include the transcript hash we might as well include everything.\r\nAs @br-hale pointed out, if we go for the beefier version of the parent hash anyway, seeking any deniability guarantees at this level makes little sense.",
+              "createdAt": "2020-10-31T18:18:29Z",
+              "updatedAt": "2020-10-31T18:18:29Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 434,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTEyNTY5NDA5",
+      "title": "move definition of ParentNode earlier",
+      "url": "https://github.com/mlswg/mls-protocol/pull/434",
+      "state": "OPEN",
+      "author": "uhoreg",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I think that this change will reduce the chance for [confusion](https://mailarchive.ietf.org/arch/msg/mls/UIWuwPC3ukryFUOANyH4cX4et3o/), as now the Parent Hash section will be self-contained, rather than needing to also look into the Tree Hashes section.  Also, it should hopefully be clearer that the `parent_hash` field in the `ParentNode` struct is calculated as the hash of another `ParentNode` struct, rather than the hash of a `ParentNodeHashInput`.\r\n\r\n(Though I don't see anywhere that says what to use as `parent_hash` when the `ParentNode` refers to the root.)",
+      "createdAt": "2020-10-29T21:06:08Z",
+      "updatedAt": "2020-10-30T20:16:38Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "master",
+      "baseRefOid": "5ea742c9770cd5f8b2964badba4e6e7b756fa13f",
+      "headRepository": "uhoreg/mls-protocol",
+      "headRefName": "hash_clarification",
+      "headRefOid": "4d2367e672bd4f0119a70fac348198cd50cc03f8",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTIxMDA1Mjcx",
+          "commit": {
+            "abbreviatedOid": "4d2367e"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2020-10-30T20:16:38Z",
+          "updatedAt": "2020-10-30T20:16:38Z",
+          "comments": []
         }
       ]
     }
