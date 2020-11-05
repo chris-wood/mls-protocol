@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-11-01T00:38:19.567546+00:00",
+  "timestamp": "2020-11-05T00:38:04.617263+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -31102,6 +31102,61 @@
           "body": "",
           "createdAt": "2020-10-30T20:16:38Z",
           "updatedAt": "2020-10-30T20:16:38Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 435,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTE0ODgxMzcy",
+      "title": "Fix parent hash verification",
+      "url": "https://github.com/mlswg/mls-protocol/pull/435",
+      "state": "OPEN",
+      "author": "dajost",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This is a spin-off from the work on tree-signing by Jo\u00ebl, Marta, and me. Note that this obsoletes #434 as I couldn't figure out how to do dependent PRs in Github.\r\n\r\nConsider the following ratchet tree and assume that (1) the left subtree is fully occupied and (2) E last committed in the right subtree, i.e., the key at node [A..F] has been sampled by E. \r\n```\r\n       [root]   \r\n           \\\r\n            \\\r\n             \\\r\n            [A..F]\r\n            /    \\\r\n           /      \\\r\n          /        \\\r\n         /          \\\r\n     [A..D]        [EF]\r\n      /  \\          /\\\r\n     /    \\        /  \\\r\n    /      \\      /    \\\r\n  [AB]    [CD]   [E]   [F]\r\n   /\\      /\\\r\n  /  \\    /  \\\r\n[A] [B] [C] [D]\r\n```\r\nNow say party Z from the left subtree committs a proposal that adds party G. According to my understanding the tree will look as follows, where I use the syntax [A..F,G] to denote that parties A to F know the secret key and G is tracked as an unmerged leaf. \r\n```\r\n       [root]   \r\n           \\\r\n            \\\r\n             \\\r\n           [A..F,G]\r\n            /    \\\r\n           /      \\\r\n          /        \\\r\n         /          \\\r\n     [A..D]        [X]\r\n      /  \\          /\\\r\n     /    \\        /  \\\r\n    /      \\      /    \\\r\n  [AB]    [CD]   [EF]  [G]\r\n   /\\      /\\     /\\\r\n  /  \\    /  \\   /  \\\r\n[A] [B] [C] [D] [E] [F]\r\n```\r\n\r\nNow observe the following two issues:\r\n* According to the draft, G now has to verify that either of [A..F,G]'s children store a correct parent hash. However, its parent-hash is no longer stored in its direct child [X], an additional blank node inserted for the add, but still in [EF] instead. This needs to be accounted for in the verification.\r\n* Orignally, the ``parent_hash`` includes ``unmerged_leaves``. Hence, for [A..F,G] the value stored in [EF] (and recursively signed by E) will no longer match the recomputed value. Since partent hashes are only updated along the committer's path which at this point has no unmerged leaves, however, there is no point in including unmerged leaves. ",
+      "createdAt": "2020-11-03T17:16:15Z",
+      "updatedAt": "2020-11-04T16:15:18Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "master",
+      "baseRefOid": "5ea742c9770cd5f8b2964badba4e6e7b756fa13f",
+      "headRepository": "dajost/mls-protocol",
+      "headRefName": "parent-hash-verification",
+      "headRefOid": "ce81177b49fcfbf555189a3c56eb28990e7c6b40",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "dajost",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I am not sure I can follow your concern. Just to clarify, this is so far just about fixing the current scheme, preserving the deniability properties. The bigger change of reversing the order of the tree hashes in the parent hashes will be a different PR.",
+          "createdAt": "2020-11-03T21:07:36Z",
+          "updatedAt": "2020-11-03T21:07:36Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Ah, if this is still about the old scheme, I would say we just wait for the change to the new one.",
+          "createdAt": "2020-11-04T16:15:18Z",
+          "updatedAt": "2020-11-04T16:15:18Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "MDE3OlB1bGxSZXF1ZXN0UmV2aWV3NTIyODUzNDcx",
+          "commit": {
+            "abbreviatedOid": "ce81177"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "I'm not sure this gets where you want.\r\n\r\nparent_hash = H(subtree headed by my parent, excluding parent_hash related stuff)",
+          "createdAt": "2020-11-03T20:32:48Z",
+          "updatedAt": "2020-11-03T20:32:48Z",
           "comments": []
         }
       ]
