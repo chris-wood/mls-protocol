@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2020-11-05T00:38:04.617263+00:00",
+  "timestamp": "2020-11-15T00:40:01.156377+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -31160,6 +31160,58 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 436,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTIwMTUxNDIx",
+      "title": "Strong tree signing",
+      "url": "https://github.com/mlswg/mls-protocol/pull/436",
+      "state": "OPEN",
+      "author": "psyoptix",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This pull request makes editorial changes to the definition of Tree Hash  to hopefully make it easier to understand.\r\n\r\nIt also redefines Parent Hash to include the HPKE public keys to which a nodes secret key was sent. This binds a key package introduced to the ratchet tree in a commit not just to the HPKE keys on the commits direct path but also (indirectly) to the other members that were sent each of the new (secret) keys. \r\n\r\nIn particular, this prevents the attacks from the mailinglist that allowed an attacker to create artificial ratchet trees where the tree invariant was violated (which in turn lead to removes failing). But parent_hash only includes the HPKE pubkeys in the resolution so at least some amount of deniability might be preserved.",
+      "createdAt": "2020-11-12T20:52:09Z",
+      "updatedAt": "2020-11-12T20:52:09Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "master",
+      "baseRefOid": "5ea742c9770cd5f8b2964badba4e6e7b756fa13f",
+      "headRepository": "dajost/mls-protocol",
+      "headRefName": "strong-tree-signing",
+      "headRefOid": "8d4e1834a674de024658ded14382eefde4e3c42b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 437,
+      "id": "MDExOlB1bGxSZXF1ZXN0NTIwNjMxOTM5",
+      "title": "Leave this phrase open to allow deniability",
+      "url": "https://github.com/mlswg/mls-protocol/pull/437",
+      "state": "OPEN",
+      "author": "claucece",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "cc./ @raphaelrobert @beurdouche ",
+      "createdAt": "2020-11-13T15:00:52Z",
+      "updatedAt": "2020-11-13T15:01:31Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "master",
+      "baseRefOid": "5ea742c9770cd5f8b2964badba4e6e7b756fa13f",
+      "headRepository": "claucece/mls-protocol",
+      "headRefName": "master",
+      "headRefOid": "92038a49d63b375bd5cf12992159660ba80cc064",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
